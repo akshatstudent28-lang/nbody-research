@@ -1,8 +1,8 @@
 # Numerical Stability, Accuracy, and Emergent Dynamics in Gravitational N-Body Systems
 
 A scientific Python research project investigating numerical methods through
-quantitative validation and controlled experiments. Part 1 provides tested data
-structures and configuration; gravity, integration, and plots are not implemented.
+quantitative validation and controlled experiments. Parts 1-2 provide tested
+data structures, configuration, Newtonian gravity, and center of mass. Time integration and plots are not implemented.
 
 ## Setup and verification (PowerShell)
 
@@ -48,9 +48,10 @@ there is no automatic unit detection or conversion.
 - src/nbody/constants.py: sourced SI gravitational constant.
 - tests/: executable data-contract tests.
 - docs/: architecture, validation, environment, and research journal.
-- physics/, integrators/, simulation/, analysis/, visualization/, utils/
-  inside src/nbody/ are pre-existing placeholders for future parts.
-- experiments/: future explicit experiment scripts.
+- src/nbody/physics/: direct gravity and center of mass.
+- integrators/, simulation/, analysis/, visualization/, utils/ inside src/nbody/
+  remain pre-existing placeholders for future parts.
+- experiments/: reproducible static validation script.
 - data/raw/, data/processed/: raw and derived datasets.
 - results/figures/, results/tables/: scientific outputs.
 
@@ -60,8 +61,31 @@ provenance; ignored outputs are not automatically backed up by Git.
 
 ## Scientific status
 
-Passing data tests does not validate Newtonian gravity, conservation, orbital
-accuracy, or any integrator. No such claims are made in Part 1.
+Part 2 validates instantaneous Newtonian interactions against analytical cases,
+symmetries, and an independent high-precision reference. This does not establish
+conservation during time evolution, orbital accuracy, or integrator validity.
+See [Part 2 results and limitations](docs/part2-gravity.md).
 See [architecture](docs/architecture.md), [validation](docs/validation.md), and
 [research journal](docs/research-journal.md). Development advances only on an
-explicit START PART X instruction. Changes are not committed automatically.
+explicit START PART X instruction. As authorized, each completed part is
+committed and pushed after its tests pass.
+
+## Evaluate gravity and reproduce Part 2
+
+```python
+from nbody.physics import accelerations, center_of_mass
+
+a = accelerations(state.masses, state.positions)  # m/s^2, shape (N, 3)
+center = center_of_mass(state.masses, state.positions)  # m, shape (3,)
+```
+
+Using the state from the example above, these evaluate an instantaneous state;
+they do not advance it in time. No softening or distance floor is applied.
+
+```powershell
+.\.venv\Scripts\python.exe experiments/validate_gravity.py --output docs/part2-validation.json
+```
+
+The report records initial data, reference values, numerical errors, and software
+versions. A failed check makes the script exit with status 1. The initial failed
+reference report is retained separately and explained in the Part 2 notes.

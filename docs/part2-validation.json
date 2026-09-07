@@ -1,0 +1,199 @@
+{
+  "scope": "instantaneous Newtonian gravity; no time integration",
+  "environment": {
+    "python": "3.14.3",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "numpy": "2.5.3",
+    "pytest": "9.1.1",
+    "package": "0.1.0"
+  },
+  "configuration": {
+    "G_m3_kg_s2": 6.6743e-11,
+    "seed": 20260907,
+    "rng": "NumPy default_rng",
+    "body_count": 8,
+    "masses_kg": [
+      14,
+      4,
+      3,
+      10,
+      13,
+      12,
+      10,
+      9
+    ],
+    "positions_m": [
+      [
+        89,
+        -23,
+        -27
+      ],
+      [
+        -23,
+        -14,
+        53
+      ],
+      [
+        26,
+        50,
+        -53
+      ],
+      [
+        38,
+        73,
+        77
+      ],
+      [
+        -16,
+        -38,
+        72
+      ],
+      [
+        -12,
+        -10,
+        -74
+      ],
+      [
+        15,
+        -41,
+        -53
+      ],
+      [
+        1,
+        61,
+        88
+      ]
+    ],
+    "reference_decimal_precision": 60,
+    "rotation_angle_rad": 0.37,
+    "translation_m": [
+      8,
+      -4,
+      2
+    ],
+    "velocities_integrator_dt_duration": "not applicable to static evaluation"
+  },
+  "computed_accelerations_m_s2": [
+    [
+      -2.2725955330258595e-13,
+      2.5228479003939593e-14,
+      6.166399228215941e-15
+    ],
+    [
+      3.148120913163872e-13,
+      -5.650974138945619e-13,
+      4.4563797114476456e-13
+    ],
+    [
+      -4.167336705719404e-14,
+      -2.832166117507194e-13,
+      8.802577462013771e-14
+    ],
+    [
+      -3.70801140765555e-13,
+      -2.3235042681778873e-13,
+      1.5776021527793498e-14
+    ],
+    [
+      1.3345072938549643e-14,
+      3.176438118604196e-13,
+      -2.640788894296014e-13
+    ],
+    [
+      2.735182464269371e-13,
+      -1.8002581431993215e-13,
+      2.737125138820657e-13
+    ],
+    [
+      -1.0208761088034875e-13,
+      3.400337221759659e-13,
+      -2.3133351292979842e-14
+    ],
+    [
+      3.689542325863204e-13,
+      -3.211688346142093e-14,
+      -2.1232334488695567e-13
+    ]
+  ],
+  "decimal_reference_accelerations_m_s2": [
+    [
+      -2.2725955330258597e-13,
+      2.522847900393958e-14,
+      6.166399228215928e-15
+    ],
+    [
+      3.1481209131638723e-13,
+      -5.650974138945622e-13,
+      4.4563797114476466e-13
+    ],
+    [
+      -4.167336705719404e-14,
+      -2.8321661175071936e-13,
+      8.802577462013773e-14
+    ],
+    [
+      -3.7080114076555507e-13,
+      -2.3235042681778873e-13,
+      1.5776021527793485e-14
+    ],
+    [
+      1.3345072938549632e-14,
+      3.176438118604196e-13,
+      -2.6407888942960147e-13
+    ],
+    [
+      2.735182464269371e-13,
+      -1.8002581431993215e-13,
+      2.737125138820657e-13
+    ],
+    [
+      -1.0208761088034874e-13,
+      3.4003372217596595e-13,
+      -2.3133351292979836e-14
+    ],
+    [
+      3.689542325863205e-13,
+      -3.211688346142089e-14,
+      -2.1232334488695567e-13
+    ]
+  ],
+  "metrics": {
+    "max_absolute_acceleration_error_m_s2": 3.0292258760486853e-28,
+    "max_error_over_max_reference_acceleration": 5.360537495954438e-16,
+    "net_force_norm_over_sum_force_norms": 3.8855557634033517e-17,
+    "rotation_error_over_max_acceleration": 1.7868458319848137e-16,
+    "translation_error_over_max_acceleration": 0.0,
+    "analytic_pair_force_N": [
+      9.610991999999999e-12,
+      1.2814656e-11,
+      0.0
+    ],
+    "expected_pair_force_N": [
+      9.610992e-12,
+      1.2814656e-11,
+      0.0
+    ],
+    "pair_force_normalized_error": 1.2607339080289257e-16,
+    "analytic_center_of_mass_m": [
+      3.0,
+      6.0,
+      -3.0
+    ],
+    "center_max_absolute_error_m": 0.0
+  },
+  "tolerances": {
+    "normalized_acceleration_and_force_error": 5e-14,
+    "normalized_internal_force_residual": 5e-15,
+    "center_absolute_error_m": 1e-14,
+    "rationale": "roundoff allowance for small float64 static cases"
+  },
+  "checks": {
+    "decimal_reference": true,
+    "internal_force_balance": true,
+    "rotation_covariance": true,
+    "translation_invariance": true,
+    "analytic_pair_force": true,
+    "analytic_center_of_mass": true
+  },
+  "passed": true
+}

@@ -74,3 +74,10 @@ Before Part 2, retain these contracts and add independent force-law checks,
 singularity rejection, translation/rotation behavior, and simple known systems.
 Later experiment records must include initial arrays, G, method, dt, step count,
 duration, seed if used, and environment. Part 1 is not that experiment pipeline.
+
+## Part 2 addition
+
+The text above records the original Part 1 design. The gravity interfaces,
+pair algorithm, center-of-mass normalization, safety contract, and validation
+are now implemented and documented in [Part 2](part2-gravity.md).
+Core state/configuration interfaces remain unchanged.

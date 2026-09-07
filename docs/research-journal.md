@@ -40,3 +40,44 @@ reproducibility improvements if needed.
 
 Next possible step: Part 2 gravity and center of mass, only after authorization.
 No Git commit was made.
+
+## 2026-09-07 - Part 2: Newtonian gravity
+
+Goal: implement and quantitatively check direct Newtonian interactions and center
+of mass without adding time evolution.
+
+Inspection: clean main at 1fa4e50; all 56 existing tests passed. Existing state
+and validators were reusable. No applicable AGENTS.md was found.
+
+Implementation: added pairwise force, unordered-pair N-body acceleration, scaled
+mass-weighted center of mass, 56 new tests, and a reproducible static validation
+script. No dependencies were added; core interfaces were preserved.
+
+Assumptions: positive point masses, SI Cartesian coordinates, float64,
+unsoftened Newtonian gravity, explicit singularity and arithmetic range errors.
+
+Tests: 112 tests passed; corrected validation report passed all six checks.
+Dependency checks and compilation succeeded. Full commands and thresholds are
+in part2-gravity.md, with inputs/results in part2-validation.json.
+
+Results: normalized independent-reference acceleration error 5.36054e-16;
+maximum absolute error 3.02923e-28 m/s^2; normalized net-force residual
+3.88556e-17. The analytical center was (3,6,-3) m with zero measured error.
+
+Failure: initial report's hand-entered pair-force reference was incorrect,
+producing normalized error 7.49086e-05. Decimal arithmetic independently
+identified the correct reference. Corrected only the reference; no production
+code or tolerance changes. Preserved part2-validation-initial.json and reran
+the report and all tests successfully.
+
+Decisions: use clear O(N^2) pair loops and O(N) memory. Evaluate accelerations
+directly rather than requiring representable pair forces for every interaction.
+Reject coincidence and arithmetic range failures explicitly. No performance
+optimization, softening, integration, or orbital conclusions.
+
+Open questions: roundoff for large coordinate offsets, extreme dynamic ranges,
+and future integrator conservation. The present static checks cannot resolve
+long-term numerical behavior.
+
+Next possible step: Part 3 simulation infrastructure, only after authorization.
+Standing user authorization permits commit/push after successful part validation.
