@@ -1,8 +1,8 @@
-# Numerical Stability, Accuracy, and Emergent Dynamics in Gravitational N-Body Systems
+﻿# Numerical Stability, Accuracy, and Emergent Dynamics in Gravitational N-Body Systems
 
 A scientific Python research project investigating numerical methods through
-quantitative validation and controlled experiments. Parts 1-2 provide tested
-data structures, configuration, Newtonian gravity, and center of mass. Time integration and plots are not implemented.
+quantitative validation and controlled experiments. Parts 1-3 provide tested
+data structures, configuration, Newtonian gravity, center of mass, and a fixed-step simulation runner. A gravitational integrator and plots are not implemented.
 
 ## Setup and verification (PowerShell)
 
@@ -49,7 +49,8 @@ there is no automatic unit detection or conversion.
 - tests/: executable data-contract tests.
 - docs/: architecture, validation, environment, and research journal.
 - src/nbody/physics/: direct gravity and center of mass.
-- integrators/, simulation/, analysis/, visualization/, utils/ inside src/nbody/
+- src/nbody/simulation/: fixed-step runner and immutable recorded snapshots.
+- integrators/, analysis/, visualization/, utils/ inside src/nbody/
   remain pre-existing placeholders for future parts.
 - experiments/: reproducible static validation script.
 - data/raw/, data/processed/: raw and derived datasets.
@@ -89,3 +90,15 @@ they do not advance it in time. No softening or distance floor is applied.
 The report records initial data, reference values, numerical errors, and software
 versions. A failed check makes the script exit with status 1. The initial failed
 reference report is retained separately and explained in the Part 2 notes.
+
+
+## Run Part 3
+
+```powershell
+.\.venv\Scripts\python.exe experiments/validate_simulation.py
+```
+
+This exact constant-velocity example records nine states and prints PASS,
+with final position [2.0, -4.0, 1.0] m at 2.0 s. It validates the simulation
+runner; it is not an orbit simulation. See [Part 3](docs/part3-simulation.md)
+for the callback API, test results, and time/memory contracts.

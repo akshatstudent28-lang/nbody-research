@@ -81,3 +81,24 @@ long-term numerical behavior.
 
 Next possible step: Part 3 simulation infrastructure, only after authorization.
 Standing user authorization permits commit/push after successful part validation.
+
+## 2026-09-07 - Part 3: simulation infrastructure
+
+Goal: decouple scheduling/history from numerical integration and force laws.
+Implemented run_simulation, SimulationResult, indexed time preflight, independent
+snapshots, and callback return/mass checks. Added a free-motion demonstration
+and 22 contract tests. No dependencies or gravitational integrators were added.
+
+Results: 134 tests passed in 0.20 s. Exact free-motion demo recorded nine states,
+ended at t=2 s and position (2,-4,1) m, with zero position error. No test failures
+or tolerance adjustments occurred. These results validate orchestration only.
+
+Decisions: the runner owns time; callback-returned time is ignored. Preserve
+configured dt for updates while requiring a representable increasing grid.
+Record all states with O(steps * bodies) storage. Equal-mass identity swaps are
+not detectable, so ordering remains a callback contract. No partial results on
+failure and no rollback of external callback side effects.
+
+Continuation checkpoint: docs/part3-progress.md. User requested durable progress
+if context is exhausted. Future work requires explicit authorization for the
+next part; gravitational integration and orbit validation remain unimplemented.

@@ -81,3 +81,10 @@ The text above records the original Part 1 design. The gravity interfaces,
 pair algorithm, center-of-mass normalization, safety contract, and validation
 are now implemented and documented in [Part 2](part2-gravity.md).
 Core state/configuration interfaces remain unchanged.
+
+## Part 3 addition
+
+Fixed-step orchestration now accepts an injected step function, owns the indexed
+time grid, and records independent SystemState snapshots. Details, executable
+example, validation, and memory/precision limits are in
+[Part 3](part3-simulation.md). No production integrator has been selected.
