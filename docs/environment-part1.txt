@@ -1,0 +1,18 @@
+Part 1 execution environment, captured 2026-09-07
+Python 3.14.3, MSC v.1944, 64 bit AMD64
+Windows-11-10.0.26200-SP0
+pip 25.3 (reported by installation notice)
+Editable local package: nbody-research==0.1.0
+
+Installed dependency snapshot from python -m pip freeze:
+colorama==0.4.6
+iniconfig==2.3.0
+numpy==2.5.3
+packaging==26.3
+pluggy==1.6.0
+Pygments==2.21.0
+pytest==9.1.1
+
+This is an environment record, not a portable lockfile.
+The local editable path was C:\Users\aksha\Projects\nbody-research.
+Build isolation installed setuptools separately; its version was not captured.
