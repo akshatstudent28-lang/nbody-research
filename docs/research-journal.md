@@ -156,3 +156,7 @@ for the final three-method study. The user's NASA-method reference remains
 unidentified; no algorithm was guessed. General RK4 and diagnostics remain later
 parts. Git update authorized; a local commit will include the previously
 uncommitted Part 4 foundation needed by Part 5. Push scope awaits clarification.
+
+Git completion: implementation committed locally as 649e366; working tree was
+verified clean after that commit. No push performed. This checkpoint records
+the implementation commit so an interrupted session does not repeat the work.

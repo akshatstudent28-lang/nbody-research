@@ -10,8 +10,8 @@ part5-conservation.png, part5-gui-check.json, part5-viewer.png.
 Guide: docs/part5-verlet.md. Launch: experiments/show_simulation.py.
 Longer scenario: --config experiments/part5_elliptical.json --view xy.
 
-Git: user authorized update; final local commit pending at this checkpoint.
-Previously uncommitted Part 4 files are needed and will be included. Do not
+Git: implementation committed locally as 649e366; no push performed.
+Previously uncommitted Part 4 files required by Part 5 are included in that commit. Do not
 claim a push unless explicitly authorized and its completion verified.
 NASA-method identity question remains unresolved; do not guess an implementation.
 No Part 6 or chaos investigation has begun. Await explicit START PART 6.
