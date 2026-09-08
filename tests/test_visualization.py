@@ -166,3 +166,101 @@ def test_four_method_selector_keeps_time_and_labels_separate():
     renderer = viewer.figure.canvas.get_renderer()
     boxes = [label.get_window_extent(renderer) for label in viewer.method_control.labels]
     assert all(not a.overlaps(b) for a, b in zip(boxes, boxes[1:]))
+
+
+@pytest.mark.parametrize("view", ["xy", "xz", "yz", "3d"])
+def test_reset_restores_camera_without_changing_time_or_method(view):
+    viewer = SimulationViewer({"Test": history()}, view=view)
+    limits = viewer._initial_limits
+    viewer.seek(1)
+    viewer.axes.set_xlim(-100, 100)
+    viewer.axes.set_ylim(40, 100)
+    if view == "3d":
+        viewer.axes.set_zlim(-10, 10)
+        viewer.axes.view_init(elev=80, azim=130, roll=20)
+    viewer.reset_button._observers.process("clicked", None)
+    assert viewer.index == 1 and viewer.method == "Test"
+    np.testing.assert_array_equal(viewer.axes.get_xlim(), limits[0])
+    np.testing.assert_array_equal(viewer.axes.get_ylim(), limits[1])
+    if view == "3d":
+        np.testing.assert_array_equal(viewer.axes.get_zlim(), limits[2])
+        assert (viewer.axes.elev, viewer.axes.azim, viewer.axes.roll) == viewer._initial_angles
+
+
+@pytest.mark.parametrize("view", ["xy", "xz", "yz", "3d"])
+def test_real_mouse_picking_and_two_property_panels(view):
+    from matplotlib.backend_bases import MouseEvent
+    from mpl_toolkits.mplot3d import proj3d
+    result = history(2)
+    viewer = SimulationViewer({"Test": result}, view=view, labels=["Alpha", "Beta"])
+    viewer.figure.canvas.draw()
+    point = result.states[0].positions[1]
+    if view == "3d":
+        x, y, _ = proj3d.proj_transform(*point, viewer.axes.get_proj())
+    else:
+        x, y = point[list(viewer.dimensions)]
+    pixel = viewer.axes.transData.transform((x, y))
+    event = MouseEvent("button_press_event", viewer.figure.canvas, *pixel, button=1)
+    viewer.figure.canvas.callbacks.process("button_press_event", event)
+    assert viewer.selected_body == 1
+    text = viewer.body_info.get_text()
+    assert "Alpha" in text and "Beta" in text
+    assert text.count("Mass [kg]") == 2 and text.count("Speed [m/s]") == 2
+    assert "Beta  [selected]" in text
+
+
+@pytest.mark.parametrize("n", [6, 12])
+def test_dropdown_real_click_scroll_and_selection(n):
+    from matplotlib.backend_bases import MouseEvent
+    viewer = SimulationViewer({"Test": history(n)})
+    dropdown = viewer.body_dropdown
+    assert dropdown is not None and not dropdown.open
+    viewer.figure.canvas.draw()
+    def click(axes, xy):
+        pixel = axes.transAxes.transform(xy)
+        for kind in ("button_press_event", "button_release_event"):
+            viewer.figure.canvas.callbacks.process(kind, MouseEvent(kind, viewer.figure.canvas, *pixel, button=1))
+    click(dropdown.button.ax, (0.5, 0.5))
+    assert dropdown.open
+    for _ in range(max(0, n-8)):
+        pixel = dropdown.axes.transAxes.transform((0.5, 0.5))
+        event = MouseEvent("scroll_event", viewer.figure.canvas, *pixel, button="down", step=-1)
+        viewer.figure.canvas.callbacks.process("scroll_event", event)
+    row = n-1-dropdown.offset
+    click(dropdown.axes, (0.4, (8-row-0.5)/9))
+    assert viewer.selected_body == n-1
+    assert not dropdown.open
+    assert f"Body {n}" in viewer.body_info.get_text()
+
+
+def test_acceleration_properties_use_configured_g_and_equal_opposite_forces():
+    initial = SystemState([2, 3], [[0, 0, 0], [3, 4, 0]], np.zeros((2, 3)))
+    viewer = SimulationViewer({"Test": SimulationResult((initial,))}, view="xy", gravitational_constant=1)
+    expected = np.array([[9/125, 12/125, 0], [-6/125, -8/125, 0]])
+    np.testing.assert_allclose(viewer.acceleration_values, expected, rtol=5e-14, atol=0)
+    np.testing.assert_allclose(initial.masses[:, None]*viewer.acceleration_values,
+        [[18/125, 24/125, 0], [-18/125, -24/125, 0]], rtol=5e-14, atol=0)
+    assert viewer.gravity_artist is not None
+    assert viewer.gravity_artist.U[0] > 0 and viewer.gravity_artist.U[1] < 0
+    before = viewer.index
+    viewer.trail_control.set_active(1)
+    assert viewer.gravity_artist is None and viewer.index == before
+
+
+def test_both_bodies_respond_to_gravity_for_all_methods():
+    functions = runpy.run_path(str(Path(__file__).parents[1]/"experiments"/"show_simulation.py"))
+    data = functions["load_system"]()
+    data["num_steps"] = 10
+    for result in functions["simulate"](data).values():
+        first, last = result.states[0], result.final_state
+        for i in (0, 1):
+            assert np.linalg.norm(last.positions[i]-first.positions[i]) > 0
+            assert np.linalg.norm(last.velocities[i]-first.velocities[i]) > 0
+
+
+def test_gravity_unavailable_does_not_invent_accelerations():
+    coincident = SystemState([1, 2], np.zeros((2, 3)), np.zeros((2, 3)))
+    viewer = SimulationViewer({"Test": SimulationResult((coincident,))})
+    assert viewer.acceleration_values is None
+    assert "Gravity unavailable" in viewer.body_info.get_text()
+    assert viewer.gravity_artist is None

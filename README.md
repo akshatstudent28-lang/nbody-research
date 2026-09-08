@@ -141,3 +141,12 @@ Velocity Verlet and synchronized kick-drift-kick Leapfrog are now available in
 the viewer. See [Part 5 results and reproducibility](docs/part5-verlet.md).
 Run experiments/validate_verlet.py for the refinement and 20-orbit study.
 Use --config experiments/part5_elliptical.json with show_simulation.py to view it.
+
+## Reset, body properties, and gravity arrows
+
+All simulations now include Reset view, clickable body inspection, simultaneous
+properties for two bodies, and a scrollable body dropdown for more than five.
+Gravity arrows show scaled net acceleration without changing the trajectories.
+See [controls and verification](docs/viewer-controls-report.md).
+Run show_simulation.py with --config experiments/six_body_visual_demo.json
+to try the dropdown with six interacting bodies.

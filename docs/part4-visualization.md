@@ -173,3 +173,12 @@ https://matplotlib.org/stable/api/backend_bases_api.html#matplotlib.backend_base
 The current viewer now defaults to Velocity Verlet and offers four methods.
 Part 4's two-method descriptions above record its historical implementation.
 See [Part 5](part5-verlet.md) for current comparisons and commands.
+
+## Shared viewer inspection update
+
+Reset view and live properties now apply to every scenario. Both bodies are shown
+in the right panel for two-body systems. More than five bodies use a dropdown.
+The viewer now evaluates read-only instantaneous accelerations for diagnostic
+arrows using the configured G; the earlier statement about no force evaluation
+is superseded for display diagnostics only. No result feeds back into motion.
+See [full report](viewer-controls-report.md).

@@ -17,3 +17,8 @@ NASA-method identity question remains unresolved; do not guess an implementation
 No Part 6 or chaos investigation has begun. Await explicit START PART 6.
 Final comparison should avoid counting equivalent Verlet/KDK as independent
 algorithms. Every future part must also update the visual simulation.
+
+Viewer inspection supplement complete: reset, properties, dropdown, gravity arrows.
+218 tests and 11 native GUI checks pass. Guide: docs/viewer-controls-report.md.
+GitHub update explicitly authorized for this supplement; verify git log/remote
+when resuming. No Part 6 work has begun.

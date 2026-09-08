@@ -1,0 +1,12 @@
+{
+  "title": "Six bodies / exploratory gravity",
+  "reference_frame": "Input inertial frame; synthetic initial conditions",
+  "labels": ["Primary", "Companion A", "Companion B", "Companion C", "Companion D", "Companion E"],
+  "masses_kg": [1e20, 1e17, 2e17, 1.5e17, 1e17, 2e17],
+  "positions_m": [[0,0,0], [1000000,0,0], [0,1600000,200000], [-2200000,0,-300000], [0,-2800000,400000], [3400000,0,-500000]],
+  "velocities_m_s": [[0,0,0], [0,81.7,0], [-64,0,5], [0,-54,2], [48,0,-2], [0,44,3]],
+  "initial_time_s": 0,
+  "dt_s": 20,
+  "num_steps": 2000,
+  "G_m3_kg_s2": 6.6743e-11
+}

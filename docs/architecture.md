@@ -105,3 +105,9 @@ method selection, and trails for arbitrary N. See [viewer](part4-visualization.m
 Velocity Verlet and synchronized KDK Leapfrog implement the existing callback
 contract with two force calls per step. No cached or staggered state is exposed.
 The viewer supports four methods. See [Part 5](part5-verlet.md).
+
+## Shared viewer inspection supplement
+
+Camera reset restores display state only. All selection paths use a stable body
+index. A one-frame acceleration cache supports read-only gravity inspection;
+launchers pass the simulation G explicitly. Simulation/integrator code is unchanged.

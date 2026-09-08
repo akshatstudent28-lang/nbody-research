@@ -8,6 +8,10 @@ from matplotlib.widgets import Button, CheckButtons, RadioButtons, Slider
 import numpy as np
 
 from nbody.simulation import SimulationResult
+from nbody.constants import G
+from nbody.core.state import _finite_real
+from nbody.physics import accelerations
+from .body_dropdown import BodyDropdown
 
 
 class SimulationViewer:
@@ -22,11 +26,19 @@ class SimulationViewer:
 
     def __init__(self, histories: Mapping[str, SimulationResult], *,
                  labels: Sequence[str] | None = None, view: str = "3d",
-                 title: str = "N-body simulation", reference_frame: str = "Input inertial frame"):
+                 title: str = "N-body simulation", reference_frame: str = "Input inertial frame",
+                 gravitational_constant: float = G):
         if not histories:
             raise ValueError("histories must contain at least one simulation")
         if view not in ("3d", "xy", "xz", "yz"):
             raise ValueError("view must be 3d, xy, xz, or yz")
+        self.gravitational_constant = _finite_real(gravitational_constant, "gravitational_constant")
+        if self.gravitational_constant <= 0:
+            raise ValueError("gravitational_constant must be positive")
+        self._gravity_key = None
+        self.acceleration_values = None
+        self.gravity_artist = None
+        self.show_gravity = True
         self.histories = dict(histories)
         if any(not isinstance(k, str) or not k or not isinstance(v, SimulationResult)
                for k, v in self.histories.items()):
@@ -67,25 +79,36 @@ class SimulationViewer:
                   "xtick.color": "#9cafc7", "ytick.color": "#9cafc7",
                   "axes.edgecolor": "#344761", "font.size": 10}
         with plt.rc_context(colors):
-            self.figure = plt.figure(figsize=(13, 8), layout=None)
+            self.figure = plt.figure(figsize=(16, 10), layout=None)
             self.figure.canvas.manager.set_window_title("N-body Research | Simulation")
-            self.axes = self.figure.add_axes([0.07, 0.27, 0.63, 0.56],
+            self.axes = self.figure.add_axes([0.06, 0.27, 0.55, 0.56],
                 projection="3d" if view == "3d" else None)
             self.figure.text(0.065, 0.94, "N-BODY / RESEARCH", color="#67dfc5", fontsize=10, weight="bold")
             self.figure.text(0.065, 0.895, title, fontsize=21, weight="bold")
             self.figure.text(0.065, 0.858, f"{reference_frame}  |  {view.upper()}  |  positions in meters",
                              color="#9cafc7", fontsize=10)
-            self.status = self.figure.text(0.73, 0.81, "", fontsize=12, linespacing=1.65)
-            self.figure.text(0.73, 0.69, "INTEGRATION METHOD", color="#67dfc5", fontsize=9, weight="bold")
-            self.method_control = RadioButtons(self.figure.add_axes([0.72, 0.46, 0.25, 0.21]),
+            self.status = self.figure.text(0.68, 0.83, "", fontsize=12, linespacing=1.65)
+            self.figure.text(0.68, 0.715, "INTEGRATION METHOD", color="#67dfc5", fontsize=9, weight="bold")
+            self.method_control = RadioButtons(self.figure.add_axes([0.68, 0.57, 0.29, 0.13]),
                                                list(self.histories), activecolor="#67dfc5")
-            self.trail_control = CheckButtons(self.figure.add_axes([0.72, 0.395, 0.25, 0.05]),
-                                               ["Show orbital trails"], [True], check_props={"color": "#67dfc5"},
+            self.trail_control = CheckButtons(self.figure.add_axes([0.68, 0.51, 0.29, 0.05]),
+                                               ["Show orbital trails", "Gravity arrows (scaled)"], [True, True], check_props={"color": "#67dfc5"},
                                                frame_props={"edgecolor": "#9cafc7"})
-            self.body_info = self.figure.text(0.73, 0.35, "", fontsize=10, va="top", linespacing=1.5)
-            self.help_text = self.figure.text(0.73, 0.195, "Click a body to inspect its name/mass.\n3D: drag to rotate; wheel to zoom.\nMarkers are not physical radii.",
-                             color="#9cafc7", fontsize=9, linespacing=1.6)
-            self.timeline = Slider(self.figure.add_axes([0.15, 0.18, 0.51, 0.025]), "Frame", 0,
+            self.figure.text(0.68, 0.48, "BODY PROPERTIES / CURRENT FRAME", color="#67dfc5", fontsize=9, weight="bold")
+            self.body_info = self.figure.text(0.68, 0.45, "", fontsize=9, va="top", linespacing=1.45, family="monospace")
+            self.help_text = self.figure.text(0.68, 0.055,
+                "Click a body to select it. Reset view restores the camera.\nGravity arrows share a scale per frame, not physical lengths.\nMarkers are not physical radii; display speed does not change dt.",
+                color="#9cafc7", fontsize=8, linespacing=1.5)
+            self.body_selector = None
+            self.body_dropdown = None
+            if 3 <= self.n_bodies <= 5:
+                self.body_selector = RadioButtons(self.figure.add_axes([0.68, 0.34, 0.29, 0.115]),
+                    [f"{i+1}. {name}" for i, name in enumerate(self.labels)], activecolor="#67dfc5")
+                self.body_info.set_position((0.68, 0.31))
+            elif self.n_bodies > 5:
+                self.body_dropdown = BodyDropdown(self.figure, self.labels, self.select_body)
+                self.body_info.set_position((0.68, 0.39))
+            self.timeline = Slider(self.figure.add_axes([0.15, 0.18, 0.46, 0.025]), "Frame", 0,
                                    max(1, len(self.times)-1), valinit=0, valstep=1, color="#67dfc5")
             if len(self.times) == 1:
                 self.timeline.set_active(False)
@@ -93,7 +116,9 @@ class SimulationViewer:
                                       color="#244b52", hovercolor="#32636a")
             self.replay_button = Button(self.figure.add_axes([0.18, 0.075, 0.105, 0.055]), "Replay",
                                         color="#243650", hovercolor="#344966")
-            self.speed_control = Slider(self.figure.add_axes([0.41, 0.09, 0.25, 0.025]), "Speed", 0.25, 4,
+            self.reset_button = Button(self.figure.add_axes([0.295, 0.075, 0.10, 0.055]), "Reset view",
+                                       color="#243650", hovercolor="#344966")
+            self.speed_control = Slider(self.figure.add_axes([0.46, 0.09, 0.15, 0.025]), "Speed", 0.25, 4,
                                         valinit=1, valstep=0.25, valfmt="%1.2fx", color="#67dfc5")
             self.figure.text(0.065, 0.025, "Playback speed changes the display only. Physics timestep is fixed for each run.",
                              color="#9cafc7", fontsize=9)
@@ -123,8 +148,18 @@ class SimulationViewer:
             if self.n_bodies <= 10:
                 self.axes.legend(loc="upper left", fontsize=8, framealpha=0.2)
             self._set_bounds()
+            self._initial_limits = (self.axes.get_xlim(), self.axes.get_ylim())
+            self._initial_angles = None
+            if self.view == "3d":
+                self._initial_limits += (self.axes.get_zlim(),)
+                self._initial_angles = (self.axes.elev, self.axes.azim, self.axes.roll)
+            self._initial_position = self.axes.get_position(original=True).frozen()
+            self._initial_box_aspect = self.axes.get_box_aspect()
         self.play_button.on_clicked(self.toggle_play)
         self.replay_button.on_clicked(self.replay)
+        self.reset_button.on_clicked(self.reset_view)
+        if self.body_selector is not None:
+            self.body_selector.on_clicked(lambda label: self.select_body(int(label.split(".", 1)[0])-1))
         self.timeline.on_changed(self._scrub)
         self.speed_control.on_changed(self.set_speed)
         self.method_control.on_clicked(self.select_method)
@@ -163,8 +198,12 @@ class SimulationViewer:
         state = self.histories[self.method].states[self.index]
         mode = "PLAYING" if self.playing else ("END OF RUN" if self.index == len(self.times)-1 and self.index else "PAUSED")
         self.status.set_text(f"{mode}\n{self.n_bodies} bodies  /  {self.index:,} of {len(self.times)-1:,} steps\nt = {state.time:,.3f} s")
-        i = self.selected_body
-        self.body_info.set_text(f"{self.labels[i]}\nMass: {state.masses[i]:.5g} kg\n1x: {self.sim_seconds_per_second:,.2f} sim s / display s")
+        self._update_gravity(state)
+        shown = range(self.n_bodies) if self.n_bodies <= 2 else [self.selected_body]
+        self.body_info.set_text("\n\n".join(self._properties(state, i) for i in shown))
+        for i, marker in enumerate(self.markers):
+            marker.set_markersize(11 if i == self.selected_body else 8)
+            marker.set_markeredgewidth(1.8 if i == self.selected_body else 0.5)
         self.play_button.label.set_text("Pause" if self.playing else "Play")
         self._setting_slider = True
         try:
@@ -217,13 +256,89 @@ class SimulationViewer:
         self._render()
 
     def _toggle_trails(self, label):
-        self.show_trails = not self.show_trails
+        if label == "Gravity arrows (scaled)":
+            self.show_gravity = not self.show_gravity
+        else:
+            self.show_trails = not self.show_trails
         self._render()
 
     def _pick(self, event):
         if event.artist in self.markers:
-            self.selected_body = self.markers.index(event.artist)
-            self._render()
+            self.select_body(self.markers.index(event.artist))
+
+    def select_body(self, index):
+        """Select a stable body row, including through real marker picking."""
+        if not isinstance(index, (int, np.integer)) or not 0 <= index < self.n_bodies:
+            raise ValueError("body index is out of range")
+        self.selected_body = int(index)
+        if self.body_dropdown is not None:
+            self.body_dropdown.set_selected(index)
+        if self.body_selector is not None:
+            expected = self.body_selector.labels[index].get_text()
+            if self.body_selector.value_selected != expected:
+                self.body_selector.set_active(index)
+                return
+        self._render()
+
+    def reset_view(self, event=None):
+        """Restore opening camera/zoom; retain time, method and playback state."""
+        self.axes.set_position(self._initial_position)
+        self.axes.set_xlim(self._initial_limits[0])
+        self.axes.set_ylim(self._initial_limits[1])
+        if self.view == "3d":
+            self.axes.set_zlim(self._initial_limits[2])
+            self.axes.view_init(elev=self._initial_angles[0], azim=self._initial_angles[1], roll=self._initial_angles[2])
+            self.axes.set_box_aspect(self._initial_box_aspect)
+        else:
+            self.axes.set_aspect("equal", adjustable="box")
+        toolbar = getattr(self.figure.canvas.manager, "toolbar", None)
+        if toolbar is not None:
+            toolbar.update()
+            toolbar.push_current()
+        self.figure.canvas.draw_idle()
+
+    def _properties(self, state, index):
+        def vector(values):
+            return "(" + ", ".join(f"{value:.3e}" for value in values) + ")"
+        name = self.labels[index]
+        heading = f"{index+1}. {name}" + ("  [selected]" if index == self.selected_body else "")
+        text = (f"{heading}\nMass [kg]: {state.masses[index]:.5e}"
+                f"\nr [m]:   {vector(state.positions[index])}"
+                f"\nv [m/s]: {vector(state.velocities[index])}"
+                f"\nSpeed [m/s]: {np.hypot.reduce(state.velocities[index]):.5e}")
+        if self.acceleration_values is None:
+            return text + "\nGravity unavailable at this state"
+        acceleration = self.acceleration_values[index]
+        return text + f"\na [m/s^2]: {vector(acceleration)}\n|a| [m/s^2]: {np.hypot.reduce(acceleration):.5e}"
+
+    def _update_gravity(self, state):
+        """Read-only instantaneous diagnostic; never feeds back into motion."""
+        key = (self.method, self.index)
+        if key != self._gravity_key:
+            self._gravity_key = key
+            try:
+                self.acceleration_values = accelerations(state.masses, state.positions,
+                    gravitational_constant=self.gravitational_constant)
+            except (ValueError, FloatingPointError):
+                self.acceleration_values = None
+        if self.gravity_artist is not None:
+            self.gravity_artist.remove()
+            self.gravity_artist = None
+        if not self.show_gravity or self.acceleration_values is None:
+            return
+        maximum = float(np.max(np.hypot.reduce(self.acceleration_values, axis=1)))
+        if maximum == 0:
+            return
+        extent = self._initial_limits[0][1]-self._initial_limits[0][0]
+        vectors = self.acceleration_values/maximum*(0.12*extent)
+        if self.view == "3d":
+            self.gravity_artist = self.axes.quiver(*state.positions.T, *vectors.T,
+                color="#67dfc5", normalize=False, arrow_length_ratio=0.25, linewidth=1.5)
+        else:
+            d0, d1 = self.dimensions
+            self.gravity_artist = self.axes.quiver(state.positions[:, d0], state.positions[:, d1],
+                vectors[:, d0], vectors[:, d1], color="#67dfc5", angles="xy", scale_units="xy", scale=1,
+                width=0.004)
 
     def _tick(self):
         if self.playing:

@@ -1,0 +1,18 @@
+{
+  "backend": "TkAgg",
+  "checks": {
+    "native_timer_advanced_frames": true,
+    "pause": true,
+    "scrub_and_method_switch": true,
+    "reset_camera": true,
+    "native_body_pick": true,
+    "dropdown_opens": true,
+    "dropdown_selects_sixth_body": true,
+    "live_properties": true,
+    "hide_trails": true,
+    "replay": true,
+    "final_frame": true
+  },
+  "errors": [],
+  "passed": true
+}

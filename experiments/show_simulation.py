@@ -86,7 +86,8 @@ def main():
     print(f"Computing {len(data['masses_kg'])} bodies, {data['num_steps']} steps per method...", flush=True)
     histories = simulate(data)
     viewer = SimulationViewer(histories, labels=data.get("labels"), view=args.view,
-                              title=data["title"], reference_frame=data["reference_frame"])
+                              title=data["title"], reference_frame=data["reference_frame"],
+                              gravitational_constant=data["G_m3_kg_s2"])
     if args.save_history:
         metadata = {"configuration": data, "methods": list(histories), "python": platform.python_version(),
                     "platform": platform.platform(),

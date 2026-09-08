@@ -160,3 +160,12 @@ uncommitted Part 4 foundation needed by Part 5. Push scope awaits clarification.
 Git completion: implementation committed locally as 649e366; working tree was
 verified clean after that commit. No push performed. This checkpoint records
 the implementation commit so an interrupted session does not repeat the work.
+
+## Viewer inspection supplement
+
+Added camera reset, real body picking, live SI properties, simultaneous two-body
+inspection, a scrollable dropdown above five bodies, and scaled acceleration
+arrows. 218 tests passed in 25.16 s; 11 native GUI checks passed. Corrected a
+timeline/property overlap found visually. Both bodies respond to gravity in all
+four methods. Physics and tolerances unchanged. User authorized GitHub update.
+Full evidence and limitations: docs/viewer-controls-report.md.
