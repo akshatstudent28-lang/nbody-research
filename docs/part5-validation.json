@@ -1,0 +1,215 @@
+{
+  "scope": "Part 5 fixed-step methods; no chaos claim",
+  "environment": {
+    "python": "3.14.3",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "numpy": "2.5.3",
+    "matplotlib": "3.11.1",
+    "pytest": "9.1.1",
+    "nbody-research": "0.1.0"
+  },
+  "tolerances": {
+    "circular_refinement_ratio_range": [
+      3.5,
+      4.5
+    ],
+    "fine_max_position_error_over_separation": 0.001,
+    "new_methods_max_relative_energy_error": 0.002,
+    "new_methods_max_relative_angular_momentum_error": 5e-12,
+    "all_methods_normalized_momentum_change": 5e-12,
+    "last_five_orbit_energy_envelope_factor": 1.2,
+    "envelope_absolute_roundoff_allowance": 1e-12,
+    "rationale": "predeclared checks for these smooth, well-resolved fixtures, not universal guarantees"
+  },
+  "refinement": [
+    {
+      "method": "velocity_verlet",
+      "num_steps": 200,
+      "dt_s": 222.01707849340855,
+      "max_position_error_over_separation": 0.002159051815711152
+    },
+    {
+      "method": "velocity_verlet",
+      "num_steps": 400,
+      "dt_s": 111.00853924670427,
+      "max_position_error_over_separation": 0.0005399122215528195
+    },
+    {
+      "method": "velocity_verlet",
+      "num_steps": 800,
+      "dt_s": 55.50426962335214,
+      "max_position_error_over_separation": 0.00013498695903330256
+    },
+    {
+      "method": "leapfrog",
+      "num_steps": 200,
+      "dt_s": 222.01707849340855,
+      "max_position_error_over_separation": 0.002159051815696465
+    },
+    {
+      "method": "leapfrog",
+      "num_steps": 400,
+      "dt_s": 111.00853924670427,
+      "max_position_error_over_separation": 0.000539912221536029
+    },
+    {
+      "method": "leapfrog",
+      "num_steps": 800,
+      "dt_s": 55.50426962335214,
+      "max_position_error_over_separation": 0.00013498695904075054
+    }
+  ],
+  "conservation": [
+    {
+      "method": "Forward Euler",
+      "max_relative_energy_error": 0.679863933451361,
+      "final_signed_relative_energy_error": 0.679863933451361,
+      "max_relative_angular_momentum_error": 0.5164345361643973,
+      "max_normalized_momentum_change": 0.0,
+      "first_five_orbit_energy_envelope": 0.4375626385619751,
+      "last_five_orbit_energy_envelope": 0.679863933451361
+    },
+    {
+      "method": "Euler-Cromer",
+      "max_relative_energy_error": 0.007371352510435905,
+      "final_signed_relative_energy_error": -0.0014006202026597286,
+      "max_relative_angular_momentum_error": 7.208732529641082e-15,
+      "max_normalized_momentum_change": 0.0,
+      "first_five_orbit_energy_envelope": 0.007371351589728393,
+      "last_five_orbit_energy_envelope": 0.007371334078823066
+    },
+    {
+      "method": "Velocity Verlet",
+      "max_relative_energy_error": 0.0001341747104164049,
+      "final_signed_relative_energy_error": 2.5311347364048965e-07,
+      "max_relative_angular_momentum_error": 4.276366754871828e-15,
+      "max_normalized_momentum_change": 0.0,
+      "first_five_orbit_energy_envelope": 0.00013417471037819662,
+      "last_five_orbit_energy_envelope": 0.00013417470755279308
+    },
+    {
+      "method": "Leapfrog (KDK)",
+      "max_relative_energy_error": 0.0001341747104063501,
+      "final_signed_relative_energy_error": 2.5311346680321423e-07,
+      "max_relative_angular_momentum_error": 9.28582495343597e-15,
+      "max_normalized_momentum_change": 0.0,
+      "first_five_orbit_energy_envelope": 0.0001341747103794032,
+      "last_five_orbit_energy_envelope": 0.0001341747075515865
+    }
+  ],
+  "checks": {
+    "velocity_verlet_second_order": true,
+    "leapfrog_second_order": true,
+    "forward_euler_momentum": true,
+    "euler_cromer_momentum": true,
+    "velocity_verlet_momentum": true,
+    "velocity_verlet_conservation": true,
+    "leapfrog_momentum": true,
+    "leapfrog_conservation": true
+  },
+  "circular_configuration": {
+    "masses_kg": [
+      1e+20,
+      2e+20
+    ],
+    "positions_m": [
+      [
+        -666666.6666666666,
+        0.0,
+        0.0
+      ],
+      [
+        333333.3333333333,
+        0.0,
+        0.0
+      ]
+    ],
+    "velocities_m_s": [
+      [
+        0.0,
+        -94.33486453409824,
+        0.0
+      ],
+      [
+        0.0,
+        47.16743226704912,
+        0.0
+      ]
+    ],
+    "G_m3_kg_s2": 6.6743e-11,
+    "initial_time_s": 0,
+    "duration_s": 44403.41569868171,
+    "steps_per_period": [
+      200,
+      400,
+      800
+    ],
+    "body_count": 2,
+    "seed": null
+  },
+  "observed_refinement": {
+    "velocity_verlet": {
+      "error_ratios": [
+        3.9988941341271946,
+        3.9997361628067942
+      ],
+      "orders_log2_ratio": [
+        1.999601088051924,
+        1.9999048377089865
+      ]
+    },
+    "leapfrog": {
+      "error_ratios": [
+        3.9988941342243516,
+        3.9997361624617205
+      ],
+      "orders_log2_ratio": [
+        1.9996010880869757,
+        1.9999048375845192
+      ]
+    }
+  },
+  "conservation_configuration": {
+    "masses_kg": [
+      1e+20,
+      2e+20
+    ],
+    "positions_m": [
+      [
+        -466666.6666666666,
+        0.0,
+        0.0
+      ],
+      [
+        233333.3333333333,
+        0.0,
+        0.0
+      ]
+    ],
+    "velocities_m_s": [
+      [
+        0.0,
+        -128.55675048490488,
+        0.0
+      ],
+      [
+        0.0,
+        64.27837524245244,
+        0.0
+      ]
+    ],
+    "G_m3_kg_s2": 6.6743e-11,
+    "dt_s": 111.00853924670427,
+    "num_steps": 8000,
+    "initial_time_s": 0,
+    "duration_s": 888068.3139736343,
+    "periods": 20,
+    "eccentricity": 0.3,
+    "semimajor_axis_m": 1000000.0,
+    "body_count": 2,
+    "seed": null,
+    "reference_frame": "initial center-of-mass frame",
+    "softening": null
+  },
+  "passed": true
+}

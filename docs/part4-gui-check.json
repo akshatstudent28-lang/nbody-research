@@ -1,0 +1,13 @@
+{
+  "backend": "TkAgg",
+  "checks": {
+    "native_timer_advanced_frames": true,
+    "pause": true,
+    "scrub_and_method_switch": true,
+    "hide_trails": true,
+    "replay": true,
+    "final_frame": true
+  },
+  "errors": [],
+  "passed": true
+}

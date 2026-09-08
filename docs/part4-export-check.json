@@ -1,0 +1,15 @@
+{
+  "exported_history_max_relative_errors": {
+    "forward_euler": 0.18466439255237493,
+    "euler_cromer": 0.0062612400755486
+  },
+  "tolerance": {
+    "rtol": 5e-14,
+    "atol": 0
+  },
+  "checks": {
+    "forward_euler": true,
+    "euler_cromer": true
+  },
+  "passed": true
+}

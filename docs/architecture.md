@@ -88,3 +88,20 @@ Fixed-step orchestration now accepts an injected step function, owns the indexed
 time grid, and records independent SystemState snapshots. Details, executable
 example, validation, and memory/precision limits are in
 [Part 3](part3-simulation.md). No production integrator has been selected.
+
+## Part 4 addition
+
+Forward Euler and Euler-Cromer implement the existing step callback contract.
+The runner and physics interfaces remain unchanged. See [Part 4](part4-euler.md).
+
+## Part 4 visual supplement
+
+SimulationViewer consumes mappings of method names to matching SimulationResult
+histories. It never advances physics. Native Matplotlib controls manage playback,
+method selection, and trails for arbitrary N. See [viewer](part4-visualization.md).
+
+## Part 5 addition
+
+Velocity Verlet and synchronized KDK Leapfrog implement the existing callback
+contract with two force calls per step. No cached or staggered state is exposed.
+The viewer supports four methods. See [Part 5](part5-verlet.md).

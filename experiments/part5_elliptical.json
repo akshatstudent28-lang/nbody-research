@@ -1,0 +1,40 @@
+{
+    "title":  "Elliptical orbit / 20 periods",
+    "reference_frame":  "initial center-of-mass frame",
+    "labels":  [
+                   "Body A",
+                   "Body B"
+               ],
+    "masses_kg":  [
+                      1E+20,
+                      2E+20
+                  ],
+    "positions_m":  [
+                        [
+                            -466666.6666666666,
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            233333.3333333333,
+                            0.0,
+                            0.0
+                        ]
+                    ],
+    "velocities_m_s":  [
+                           [
+                               0.0,
+                               -128.55675048490488,
+                               0.0
+                           ],
+                           [
+                               0.0,
+                               64.27837524245244,
+                               0.0
+                           ]
+                       ],
+    "initial_time_s":  0,
+    "dt_s":  111.00853924670427,
+    "num_steps":  8000,
+    "G_m3_kg_s2":  6.6743E-11
+}

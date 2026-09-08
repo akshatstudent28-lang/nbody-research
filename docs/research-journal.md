@@ -102,3 +102,57 @@ failure and no rollback of external callback side effects.
 Continuation checkpoint: docs/part3-progress.md. User requested durable progress
 if context is exhausted. Future work requires explicit authorization for the
 next part; gravitational integration and orbit validation remain unimplemented.
+
+## Part 4 - 2026-09-07
+
+Goal: implement and validate Forward Euler and Euler-Cromer using the Part 3
+runner and Part 2 gravity. Inspected existing contracts and preserved prior
+uncommitted README/Part 3 checkpoint changes. Added two first-order callbacks,
+22 focused test cases, and a deterministic circular two-body benchmark.
+Assumptions: Newtonian point masses, positive fixed dt, SI units, no softening.
+Validation: final full suite 156 passed in 0.20 s; benchmark passed its
+predeclared refinement and fine-error checks; pip check and compileall passed.
+No numerical tests failed and no tolerances were changed. Maximum relative
+position errors at 1000/2000 steps were 0.3585324/0.1846644 (Forward Euler)
+and 0.01247866/0.00626124 (Euler-Cromer). These are errors normalized by initial
+separation, measured over all saved times, not only the final endpoint.
+Observation: correct implementation does not imply adequate orbital accuracy.
+Decision: retain both methods as research baselines; defer general diagnostics,
+formal convergence studies and long-term claims to their roadmap parts.
+Open question: how do higher-order/symplectic methods behave under controlled
+comparison? Next possible step is Part 5 only after explicit authorization.
+No commit or push performed. Full method and experiment notes: part4-euler.md.
+
+## Part 4 visual supplement - 2026-09-07
+
+Goal: make arbitrary-body visual simulation a core project deliverable.
+Implemented a Matplotlib history viewer and runnable two-/four-body examples,
+configurable JSON inputs, two-method playback, and complete NPZ history export.
+Scientific assumption: displayed positions are recorded numerical states;
+visual plausibility is not validation. Four-body configuration is exploratory.
+Verification: 182 tests passed in 11.64 s; six native TkAgg GUI checks passed;
+rendered XY/3D scenes visually inspected. Exported default histories reproduce
+prior maximum errors exactly (0.18466439255237493 and 0.0062612400755486).
+Found and fixed overlapping help text; added layout regression test. One
+shell-quoted verification failed, then passed as a saved Python script.
+Dependency/syntax checks passed. No numerical tolerance was changed.
+Decision: preserve physics/playback separation; each future part must extend
+the viewer appropriately. Requirement saved in AGENTS.md. Next possible part:
+Part 5, only on authorization. No commit/push performed.
+
+## Part 5 - 2026-09-07
+
+Goal: implement Velocity Verlet/KDK Leapfrog and integrate both into the viewer.
+Reused physics and runner contracts; returned velocities remain synchronized.
+Added analytical, reversibility, equivalence, safety and visual selector tests.
+205 tests passed in 12.98 s; six native GUI checks passed; previews inspected.
+Circular refinement measured order ~1.9996 to 1.9999. Twenty elliptical periods
+at 400 steps/period produced max relative energy errors 0.679864 (Forward Euler),
+0.00737135 (Euler-Cromer), and 0.000134175 (Verlet and Leapfrog). Preserved all
+results; no numerical failures or tolerance changes. Symplectic energy error
+oscillated over this interval; no arbitrary-duration or chaos claim is justified.
+Decision: describe Verlet/KDK equivalence explicitly, not as independent methods
+for the final three-method study. The user's NASA-method reference remains
+unidentified; no algorithm was guessed. General RK4 and diagnostics remain later
+parts. Git update authorized; a local commit will include the previously
+uncommitted Part 4 foundation needed by Part 5. Push scope awaits clarification.

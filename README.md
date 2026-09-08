@@ -1,9 +1,34 @@
-﻿# Numerical Stability, Accuracy, and Emergent Dynamics in Gravitational N-Body Systems
+# Numerical Stability, Accuracy, and Emergent Dynamics in Gravitational N-Body Systems
 
 A scientific Python research project investigating numerical methods through
-quantitative validation and controlled experiments. Parts 1-3 provide tested
-data structures, configuration, Newtonian gravity, center of mass, and a fixed-step simulation runner. A gravitational integrator and plots are not implemented.
+quantitative validation and controlled experiments. Parts 1-5 provide tested
+data structures, configuration, Newtonian gravity, center of mass, a fixed-step simulation runner, and Forward Euler, Euler-Cromer, Velocity Verlet, and Leapfrog integrators. An interactive arbitrary-N visual simulation is available.
 
+
+## See the simulation (VS Code terminal)
+
+```powershell
+.\.venv\Scripts\python.exe experiments/show_simulation.py
+```
+
+A native animation window opens with Play/Pause, Replay, a frame timeline,
+playback speed, orbital trails, and integration-method selection. Default:
+two moving bodies, 3D view, Velocity Verlet, and four selectable implementations. Add --view xy for a planar view.
+
+For four bodies:
+
+```powershell
+.\.venv\Scripts\python.exe experiments/show_simulation.py --config experiments/four_body_visual_demo.json
+```
+
+Custom JSON supports arbitrary N with explicit SI masses, positions, velocities,
+dt, and step count. The four-body example is exploratory, not scientifically
+validated orbital behavior. See [visual simulation guide](docs/part4-visualization.md)
+for controls, custom systems, exports, tests, and limits.
+
+Every future part must also update the visual simulation with its relevant
+capabilities and results, while retaining quantitative scientific validation.
+This project requirement is recorded in AGENTS.md.
 ## Setup and verification (PowerShell)
 
 Python 3.10 or newer is declared supported; see docs/validation.md for the tested
@@ -16,8 +41,8 @@ python -m venv .venv
 .\.venv\Scripts\python.exe -m pip check
 ```
 
-NumPy is the only runtime dependency. pytest is a development dependency.
-Matplotlib will be added when a scientific figure is needed. pyproject.toml
+NumPy and Matplotlib are runtime dependencies. pytest is a development dependency.
+Matplotlib provides interactive trajectory playback. pyproject.toml
 is the dependency source of truth; no redundant requirements.txt is needed.
 An actual environment snapshot is recorded in docs/environment-part1.txt.
 
@@ -50,7 +75,9 @@ there is no automatic unit detection or conversion.
 - docs/: architecture, validation, environment, and research journal.
 - src/nbody/physics/: direct gravity and center of mass.
 - src/nbody/simulation/: fixed-step runner and immutable recorded snapshots.
-- integrators/, analysis/, visualization/, utils/ inside src/nbody/
+- src/nbody/integrators/: Forward Euler and Euler-Cromer numerical updates.
+- src/nbody/visualization/: interactive 3D and planar N-body history viewer.
+- analysis/, utils/ inside src/nbody/
   remain pre-existing placeholders for future parts.
 - experiments/: reproducible static validation script.
 - data/raw/, data/processed/: raw and derived datasets.
@@ -68,8 +95,7 @@ conservation during time evolution, orbital accuracy, or integrator validity.
 See [Part 2 results and limitations](docs/part2-gravity.md).
 See [architecture](docs/architecture.md), [validation](docs/validation.md), and
 [research journal](docs/research-journal.md). Development advances only on an
-explicit START PART X instruction. As authorized, each completed part is
-committed and pushed after its tests pass.
+explicit START PART X instruction. Commits and pushes require explicit user authorization.
 
 ## Evaluate gravity and reproduce Part 2
 
@@ -102,3 +128,16 @@ This exact constant-velocity example records nine states and prints PASS,
 with final position [2.0, -4.0, 1.0] m at 2.0 s. It validates the simulation
 runner; it is not an orbit simulation. See [Part 3](docs/part3-simulation.md)
 for the callback API, test results, and time/memory contracts.
+
+## Run Part 4
+
+See [Part 4 implementation and measured orbital errors](docs/part4-euler.md).
+Run experiments/validate_euler.py with the project Python, optionally passing
+--output docs/part4-validation.json to preserve the report.
+
+## Part 5: symplectic methods and comparison
+
+Velocity Verlet and synchronized kick-drift-kick Leapfrog are now available in
+the viewer. See [Part 5 results and reproducibility](docs/part5-verlet.md).
+Run experiments/validate_verlet.py for the refinement and 20-orbit study.
+Use --config experiments/part5_elliptical.json with show_simulation.py to view it.
